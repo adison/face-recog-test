@@ -11,6 +11,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 @interface ViewController : UIViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
     UIImage *pImage;
+    CGFloat scale;
 }
 
 @property (nonatomic) IBOutlet UIImageView *imageView;

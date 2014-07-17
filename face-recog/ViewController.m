@@ -15,6 +15,7 @@
 @implementation ViewController
 @synthesize imageView;
 @synthesize seg;
+
 -(void)recog {
     UIImage *image = [pImage copy];
     int exifOrientation;
@@ -67,36 +68,66 @@
     CGContextTranslateCTM(context, 0, CGRectGetHeight(imageView.bounds));
     CGContextScaleCTM(context, 1.0f, -1.0f);
 
-    CGFloat scale = [UIScreen mainScreen].scale;
+    scale = image.size.height/[UIScreen mainScreen].bounds.size.height;
 
+    CGAffineTransform transform = CGAffineTransformMakeScale(1, -1);
+    transform = CGAffineTransformTranslate(transform, 0, -imageView.bounds.size.height);
+
+    
     if (scale > 1.0) {
         // Loaded 2x image, scale context to 50%
         CGContextScaleCTM(context, 0.5, 0.5);
     }
-
     for (CIFaceFeature *feature in features) {
+        // 底層顏色
         CGContextSetRGBFillColor(context, 0.0f, 0.0f, 0.0f, 0.5f);
+        // 筆觸顏色
         CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
-        CGContextSetLineWidth(context, 2.0f * scale);
-        CGContextAddRect(context, feature.bounds);
+        // 線條寬度
+        CGContextSetLineWidth(context, 2.0f);// * scale);
+        // 加個框
+        CGRect b = feature.bounds;
+//        b.origin.x /= scale;
+//        b.origin.y /= scale;
+//        b.origin.y = imageView.bounds.size.height - b.origin.y;
+//        b.size.height /=scale;
+//        b.size.width /= scale;
+        CGContextAddRect(context, b);
+        // 畫線
         CGContextDrawPath(context, kCGPathFillStroke);
 
         // Set red feature color
         CGContextSetRGBFillColor(context, 1.0f, 0.0f, 0.0f, 0.4f);
 
+//        CGPoint c;
         if (feature.hasLeftEyePosition) {
-            [self drawFeatureInContext:context atPoint:feature.leftEyePosition];
+            CGContextSetRGBFillColor(context, 0.0f, 1.0f, 0.0f, 0.8f);
+            NSLog(@"x %f, y %f", feature.leftEyePosition.x, feature.leftEyePosition.y);
+            const CGPoint leftEyePos = CGPointApplyAffineTransform(feature.leftEyePosition, transform);
+            NSLog(@"x %f, y %f", leftEyePos.x, leftEyePos.y);
+            [self drawFeatureInContext:context atPoint:leftEyePos];
         }
 
         if (feature.hasRightEyePosition) {
-            [self drawFeatureInContext:context atPoint:feature.rightEyePosition];
+            CGContextSetRGBFillColor(context, 0.0f, 0.0f, 1.0f, 0.8f);
+            const CGPoint rightEyePos = CGPointApplyAffineTransform(feature.rightEyePosition, transform);
+            [self drawFeatureInContext:context atPoint:rightEyePos];
+
+//            [self drawFeatureInContext:context atPoint:c];
         }
 
         if (feature.hasMouthPosition) {
-            [self drawFeatureInContext:context atPoint:feature.mouthPosition];
-        }
-    }
+            CGContextSetRGBFillColor(context, 1.0f, 1.0f, 1.0f, 0.8f);
+            const CGPoint mouthPos = CGPointApplyAffineTransform(feature.mouthPosition, transform);
+            [self drawFeatureInContext:context atPoint:mouthPos];
 
+//            [self drawFeatureInContext:context atPoint:c];
+        }
+        
+        [self xdrawFeatureInContext:context atPoint:CGPointMake(300, 300)];
+    }
+    
+    
     self.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
@@ -134,6 +165,10 @@
 }
 
 #pragma mark - 基本
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    self.navigationController.navigationBarHidden = YES;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
@@ -177,9 +212,30 @@
     
 }
 
+
+// 在指定點畫圖
+- (void)xdrawFeatureInContext:(CGContextRef)context atPoint:(CGPoint)featurePoint {
+    
+    //    featurePoint.x /= scale;
+    //    featurePoint.y /= scale; //(imageView.bounds.size.height) - (featurePoint.y/scale);
+    //    featurePoint.y /= scale; //(imageView.bounds.size.height*2) - (featurePoint.y/scale);
+    NSLog(@"x %f, y %f", featurePoint.x, featurePoint.y);
+    
+    CGFloat radius = 30.0f;// * [UIScreen mainScreen].scale/scale;
+    CGContextAddArc(context, featurePoint.x, featurePoint.y, radius, 0, M_PI * 2, 1);
+    CGContextDrawPath(context, kCGPathFillStroke);
+}
+
+
 // 在指定點畫圖
 - (void)drawFeatureInContext:(CGContextRef)context atPoint:(CGPoint)featurePoint {
-    CGFloat radius = 20.0f * [UIScreen mainScreen].scale;
+    
+//    featurePoint.x /= scale;
+//    featurePoint.y /= scale; //(imageView.bounds.size.height) - (featurePoint.y/scale);
+//    featurePoint.y /= scale; //(imageView.bounds.size.height*2) - (featurePoint.y/scale);
+    NSLog(@"x %f, y %f", featurePoint.x, featurePoint.y);
+    
+    CGFloat radius = 20.0f * [UIScreen mainScreen].scale/scale;
     CGContextAddArc(context, featurePoint.x, featurePoint.y, radius, 0, M_PI * 2, 1);
     CGContextDrawPath(context, kCGPathFillStroke);
 }
