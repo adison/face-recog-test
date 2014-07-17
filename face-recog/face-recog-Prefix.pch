@@ -13,4 +13,9 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
+#import <BlocksKit/BlocksKit.h>
+#import <BlocksKit/BlocksKit+UIKit.h>
+#import <BlocksKit/BKMacros.h>
 #endif
+
+#define NSPRINTF(f, ...) [NSString stringWithFormat:f, __VA_ARGS__]

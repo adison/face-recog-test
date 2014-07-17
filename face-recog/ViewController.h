@@ -7,7 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <KGModal/KGModal.h>
+#import <MobileCoreServices/MobileCoreServices.h>
+@interface ViewController : UIViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
+    UIImage *pImage;
+}
 
-@interface ViewController : UIViewController
-
+@property (nonatomic) IBOutlet UIImageView *imageView;
+-(IBAction)tapPhoto:(id)sender;
+-(IBAction)tapGoMoview:(id)sender;
 @end
