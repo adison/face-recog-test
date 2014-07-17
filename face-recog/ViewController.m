@@ -14,7 +14,7 @@
 
 @implementation ViewController
 @synthesize imageView;
-
+@synthesize seg;
 -(void)recog {
     UIImage *image = [pImage copy];
     int exifOrientation;
@@ -54,55 +54,51 @@
                                                   options:detectorOptions];
     NSArray *features = [faceDetector featuresInImage:[CIImage imageWithCGImage:image.CGImage]
                                               options:@{CIDetectorImageOrientation:@(exifOrientation)}];
+    UIImage *faceImage = image;
 
-    //    UIImage *faceImage = picture;
-    
-    //    UIGraphicsBeginImageContextWithOptions(faceImage.size, YES, 0);
-    //    [faceImage drawInRect:imageView.bounds];
-    
-    //    // Get image context reference
-    //    CGContextRef context = UIGraphicsGetCurrentContext();
-    //
-    //    // Flip Context
-    //    CGContextTranslateCTM(context, 0, CGRectGetHeight(imageView.bounds));
-    //    CGContextScaleCTM(context, 1.0f, -1.0f);
-    //
-    //    CGFloat scale = [UIScreen mainScreen].scale;
-    //
-    //    if (scale > 1.0) {
-    //        // Loaded 2x image, scale context to 50%
-    //        CGContextScaleCTM(context, 0.5, 0.5);
-    //    }
-    //
-    //    for (CIFaceFeature *feature in features) {
-    ////        for (CIFeature *ff in features) {
-    ////            NSLog(@"類型 %@, 位置 %f", ff.type, ff.bounds.size.width);
-    //
-    //
-    //        CGContextSetRGBFillColor(context, 0.0f, 0.0f, 0.0f, 0.5f);
-    //        CGContextSetStrokeColorWithColor(context, [UIColor whiteColor].CGColor);
-    //        CGContextSetLineWidth(context, 2.0f * scale);
-    //        CGContextAddRect(context, feature.bounds);
-    //        CGContextDrawPath(context, kCGPathFillStroke);
-    //
-    //        // Set red feature color
-    //        CGContextSetRGBFillColor(context, 1.0f, 0.0f, 0.0f, 0.4f);
-    //
-    //        if (feature.hasLeftEyePosition) {
-    //            [self drawFeatureInContext:context atPoint:feature.leftEyePosition];
-    //        }
-    //
-    //        if (feature.hasRightEyePosition) {
-    //            [self drawFeatureInContext:context atPoint:feature.rightEyePosition];
-    //        }
-    //
-    //        if (feature.hasMouthPosition) {
-    //            [self drawFeatureInContext:context atPoint:feature.mouthPosition];
-    //        }
-    //    }
-    //
-    //    self.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-    //    UIGraphicsEndImageContext();
+//    UIGraphicsBeginImageContextWithOptions(faceImage.size, YES, 0);
+    UIGraphicsBeginImageContextWithOptions(imageView.bounds.size, YES, 0);
+    [faceImage drawInRect:imageView.bounds];
+
+    // Get image context reference
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    // Flip Context
+    CGContextTranslateCTM(context, 0, CGRectGetHeight(imageView.bounds));
+    CGContextScaleCTM(context, 1.0f, -1.0f);
+
+    CGFloat scale = [UIScreen mainScreen].scale;
+
+    if (scale > 1.0) {
+        // Loaded 2x image, scale context to 50%
+        CGContextScaleCTM(context, 0.5, 0.5);
+    }
+
+    for (CIFaceFeature *feature in features) {
+        CGContextSetRGBFillColor(context, 0.0f, 0.0f, 0.0f, 0.5f);
+        CGContextSetStrokeColorWithColor(context, [UIColor redColor].CGColor);
+        CGContextSetLineWidth(context, 2.0f * scale);
+        CGContextAddRect(context, feature.bounds);
+        CGContextDrawPath(context, kCGPathFillStroke);
+
+        // Set red feature color
+        CGContextSetRGBFillColor(context, 1.0f, 0.0f, 0.0f, 0.4f);
+
+        if (feature.hasLeftEyePosition) {
+            [self drawFeatureInContext:context atPoint:feature.leftEyePosition];
+        }
+
+        if (feature.hasRightEyePosition) {
+            [self drawFeatureInContext:context atPoint:feature.rightEyePosition];
+        }
+
+        if (feature.hasMouthPosition) {
+            [self drawFeatureInContext:context atPoint:feature.mouthPosition];
+        }
+    }
+
+    self.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
     
     [UIAlertView bk_showAlertViewWithTitle:@"結果"
                                    message:NSPRINTF(@"有 %d 頭", features.count)
@@ -114,14 +110,25 @@
 }
 
 -(IBAction)tapPhoto:(id)sender {
-    UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
-    imagePickerController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+    UIImagePickerController *cameraUI = [[UIImagePickerController alloc] init];
+    cameraUI.modalPresentationStyle = UIModalPresentationCurrentContext;
+    cameraUI.sourceType = UIImagePickerControllerSourceTypeCamera;
 //    imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-
-    imagePickerController.delegate = self;
+    // 前鏡頭
+    if ([seg selectedSegmentIndex]==1) {
+        cameraUI.cameraDevice = UIImagePickerControllerCameraDeviceFront;
+//        cameraUI.cameraViewTransform = CGAffineTransformScale(cameraUI.cameraViewTransform, -1, 1);
+        
+    }
+    else {
+        cameraUI.cameraDevice = UIImagePickerControllerCameraDeviceRear;
+    }
     
-    [self presentViewController:imagePickerController animated:YES completion:^{
+    
+
+    cameraUI.delegate = self;
+    
+    [self presentViewController:cameraUI animated:YES completion:^{
 
     }];
 }
@@ -154,6 +161,10 @@
     NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         UIImage *image = picture;
+        if ([seg selectedSegmentIndex]==1) {
+//            image = [UIImage imageWithCGImage:picture.CGImage scale:picture.scale orientation:UIImageOrientationLeftMirrored];
+        }
+
 //        [imageView setAutoresizingMask:(UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth)];
         UIImageWriteToSavedPhotosAlbum(image,
                                        self,

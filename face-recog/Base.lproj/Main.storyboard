@@ -40,6 +40,16 @@
                                             <action selector="tapPhoto:" destination="vXZ-lx-hvc" id="0lW-b6-16b"/>
                                         </connections>
                                     </barButtonItem>
+                                    <barButtonItem style="plain" id="QIh-xk-hw7">
+                                        <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="fiy-KD-Kdr">
+                                            <rect key="frame" x="94" y="7" width="123" height="30"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <segments>
+                                                <segment title="後"/>
+                                                <segment title="前"/>
+                                            </segments>
+                                        </segmentedControl>
+                                    </barButtonItem>
                                     <barButtonItem style="plain" systemItem="flexibleSpace" id="tSL-8g-cBg"/>
                                     <barButtonItem title="攝影測試" id="o7K-Nj-g0Z"/>
                                 </items>
@@ -54,6 +64,7 @@
                     <navigationItem key="navigationItem" id="uwV-dA-lhh"/>
                     <connections>
                         <outlet property="imageView" destination="Fux-B2-Ylk" id="zZ8-2O-aJy"/>
+                        <outlet property="seg" destination="fiy-KD-Kdr" id="aR8-Id-UZE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>

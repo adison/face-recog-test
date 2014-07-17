@@ -14,6 +14,8 @@
 }
 
 @property (nonatomic) IBOutlet UIImageView *imageView;
+@property (nonatomic) IBOutlet UISegmentedControl *seg;
 -(IBAction)tapPhoto:(id)sender;
 -(IBAction)tapGoMoview:(id)sender;
+
 @end
