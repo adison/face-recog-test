@@ -18,8 +18,8 @@
 -(void)recog {
     UIImage *image = [pImage copy];
     int exifOrientation;
-    // 偵測方向
 
+    // 偵測方向
     switch (image.imageOrientation) {
         case UIImageOrientationDown:
             exifOrientation = 3;
@@ -42,29 +42,19 @@
         case UIImageOrientationRightMirrored:
             exifOrientation = 7;
             break;
-            
-        default:
         case UIImageOrientationUp:
             exifOrientation = 1;
             break;
     }
     
-//    exifOrientation = 1;
-    
-    NSDictionary *detectorOptions = [[NSDictionary alloc] initWithObjectsAndKeys:CIDetectorAccuracyLow, CIDetectorAccuracy, nil]; //apple
-//	NSDictionary *detectorOptions = @{ CIDetectorAccuracy : CIDetectorAccuracyHigh };
+    NSDictionary *detectorOptions = @{ CIDetectorAccuracy : CIDetectorAccuracyHigh };
 	
     CIDetector *faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace
                                                   context:nil
                                                   options:detectorOptions];
-    faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions]; // apple
-//    imageOptions = [NSDictionary dictionaryWithObject:orientation forKey:CIDetectorImageOrientation];
     NSArray *features = [faceDetector featuresInImage:[CIImage imageWithCGImage:image.CGImage]
-                                              options:@{CIDetectorImageOrientation:[NSNumber numberWithInt:exifOrientation]}];
-    NSLog(@"Feature size: %d", features.count);
-    NSLog(@"Feature size: %@", features);    
-    
-    
+                                              options:@{CIDetectorImageOrientation:@(exifOrientation)}];
+
     //    UIImage *faceImage = picture;
     
     //    UIGraphicsBeginImageContextWithOptions(faceImage.size, YES, 0);
@@ -132,14 +122,11 @@
     imagePickerController.delegate = self;
     
     [self presentViewController:imagePickerController animated:YES completion:^{
+
     }];
-    
 }
 
-
-
 #pragma mark - 基本
-
 - (void)viewDidLoad {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
@@ -151,8 +138,6 @@
 }
 
 #pragma mark - UIImagePickerControllerDelegate
-
-// This method is called when an image has been chosen from the library or taken from the camera.
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
     // 取照片
@@ -160,20 +145,19 @@
     pImage = picture;
     
     self.imageView.image = pImage;
-
     
     [self dismissViewControllerAnimated:YES completion:^{
         [self recog];
     }];
     
-    // 存照片
+    // 存起來照片
     NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         UIImage *image = picture;
 //        [imageView setAutoresizingMask:(UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth)];
         UIImageWriteToSavedPhotosAlbum(image,
                                        self,
-                                       @selector(image:finishedSavingWithError:contextInfo:),
+                                       @selector(image:finishedSavingWithError:contextInfo:), // 要照標準命名
                                        nil);
     }
     else if ([mediaType isEqualToString:(NSString *)kUTTypeMovie]) {
@@ -195,7 +179,7 @@
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
-
+// 照片儲存完成
 -(void)image:(UIImage *)image finishedSavingWithError:(NSError *)error contextInfo:(void *)contextInfo {
     if (error) {
         UIAlertView *alert = [[UIAlertView alloc]
