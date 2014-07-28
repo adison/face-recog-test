@@ -17,7 +17,8 @@
     NSURL *pUrl;
 }
 
-
+@property (nonatomic) IBOutlet UISegmentedControl *xSeg;
+@property (nonatomic) IBOutlet UISegmentedControl *xSegCamera;
 @property (nonatomic) IBOutlet UIImageView* xImgView;
 /**
  *  上傳

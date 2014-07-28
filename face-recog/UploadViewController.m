@@ -14,6 +14,7 @@
 
 @implementation UploadViewController
 @synthesize xImgView;
+@synthesize xSeg, xSegCamera;
 
 #pragma mark - 上傳
 -(IBAction)tapShowPhoto:(id)sender {
@@ -31,6 +32,8 @@
 }
 
 -(IBAction)tapUpload:(id)sender {
+    UIControl *b = (UIControl*)sender;
+    b.enabled = NO;
     // 把圖片更改尺寸、壓縮，改名字為 xx.png
     pUrl = nil;
     
@@ -42,12 +45,14 @@
     
     NSData *dataToUpload = UIImagePNGRepresentation(vImg);
     
-    NSURL *url = [NSURL URLWithString:@"http://adison-murmur.herokuapp.com/"];
+//    NSURL *url = [NSURL URLWithString:@"http://adison-murmur.herokuapp.com/"];
+        NSURL *url = [NSURL URLWithString:@"https://m.senao.com.tw/"];
     AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:url];
     
     NSURLRequest *request = [httpClient
                              multipartFormRequestWithMethod:@"POST"
-                             path:@"upload_file.php"
+//                             path:@"upload_file.php"
+                             path:@"dev_appsvc/jsp/facesex/FileUpload.jsp"
                              parameters:@{}
                              constructingBodyWithBlock: ^(id <AFMultipartFormData> formData) {
                                  [formData appendPartWithFileData:dataToUpload
@@ -71,23 +76,46 @@
         NSLog(@"%0.1f %%", progress);
     }];
     
-    // 檢查是否上傳成功？, 顯示心檔名
+    // 檢查是否上傳成功？, 顯示檔名
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id response) {
         [SVProgressHUD dismiss];
+        b.enabled = YES;
         NSLog(@"response string: %@", operation.responseString);
         if (response != nil) {
             NSDictionary *json = (NSDictionary*)response;
+// murmur
+//            [UIAlertView bk_showAlertViewWithTitle:@"上傳成功"
+//                                            message:NSPRINTF(@"檔案名稱%@, 位置: %@",
+//                                                             [json objectForKey:@"Upload"],
+//                                                             [json objectForKey:@"link"])
+//              
+//                                  cancelButtonTitle:@"關閉"
+//                                  otherButtonTitles:nil
+//                                            handler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+//             
+//                                            }];
+//            pUrl = [NSURL URLWithString:[json objectForKey:@"link"]];
             
-            [UIAlertView bk_showAlertViewWithTitle:@"上傳成功"
-                                           message:NSPRINTF(@"檔案名稱%@, 位置: %@",
-                                                            [json objectForKey:@"Upload"],
-                                                            [json objectForKey:@"link"])
-                                 cancelButtonTitle:@"關閉"
-                                 otherButtonTitles:nil
-                                           handler:^(UIAlertView *alertView, NSInteger buttonIndex) {
-                                               
-                                           }];
-            pUrl = [NSURL URLWithString:[json objectForKey:@"link"]];
+            if ([[json objectForKey:@"code"] isEqualToString:@"0"]) {
+                [UIAlertView bk_showAlertViewWithTitle:@"判別成功"
+                                               message:NSPRINTF(@"性別 %@",
+                                                                [json objectForKey:@"gender"])
+                                     cancelButtonTitle:@"關閉"
+                                     otherButtonTitles:nil
+                                               handler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                                                   
+                                               }];
+            }
+            else {
+                [UIAlertView bk_showAlertViewWithTitle:@"判別失敗"
+                                               message:NSPRINTF(@"性別 %@",
+                                                                [json objectForKey:@"gender"])
+                                     cancelButtonTitle:@"關閉"
+                                     otherButtonTitles:nil
+                                               handler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                                                   
+                                               }];
+            }
             
         } else {
             [UIAlertView bk_showAlertViewWithTitle:@"上傳失敗"
@@ -102,6 +130,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [SVProgressHUD dismiss];
+        b.enabled = YES;
         [UIAlertView bk_showAlertViewWithTitle:@"上傳失敗"
                                        message:NSPRINTF(@"Error: %@", [error localizedDescription])
                              cancelButtonTitle:@"關閉"
@@ -116,6 +145,8 @@
 
 #pragma mark - 相片
 -(IBAction)tapPickPhoto:(id)sender {
+    isFromGallery = (xSeg.selectedSegmentIndex == 0) ? NO: YES;
+    
     UIImagePickerController *cameraUI = [[UIImagePickerController alloc] init];
     cameraUI.modalPresentationStyle = UIModalPresentationCurrentContext;
     if (isFromGallery) {
@@ -123,9 +154,7 @@
     }
     else {
         cameraUI.sourceType = UIImagePickerControllerSourceTypeCamera;
-        // 前鏡頭
-//        cameraUI.cameraDevice = UIImagePickerControllerCameraDeviceFront;
-        cameraUI.cameraDevice = UIImagePickerControllerCameraDeviceRear;
+        cameraUI.cameraDevice = (xSegCamera.selectedSegmentIndex == 0) ? UIImagePickerControllerCameraDeviceRear : UIImagePickerControllerCameraDeviceFront;
     }
     cameraUI.delegate = self;
     
@@ -135,12 +164,11 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    
+
     // 取照片
     UIImage* picture = [info objectForKey:UIImagePickerControllerOriginalImage];
     pImg = picture;
     xImgView.image = picture;
-    
     
     // 存起來照片
     NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
@@ -190,6 +218,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.title = @"性別判別";
     // Do any additional setup after loading the view.
 }
 
