@@ -97,7 +97,7 @@
 //            pUrl = [NSURL URLWithString:[json objectForKey:@"link"]];
             
             if ([[json objectForKey:@"code"] isEqualToString:@"0"]) {
-                [UIAlertView bk_showAlertViewWithTitle:@"判別成功"
+                [UIAlertView bk_showAlertViewWithTitle:([json objectForKey:@"genderResult"]) ?  @"判別成功" : @"判別失敗"
                                                message:NSPRINTF(@"性別 %@",
                                                                 [json objectForKey:@"gender"])
                                      cancelButtonTitle:@"關閉"
@@ -107,16 +107,15 @@
                                                }];
             }
             else {
-                [UIAlertView bk_showAlertViewWithTitle:@"判別失敗"
-                                               message:NSPRINTF(@"性別 %@",
-                                                                [json objectForKey:@"gender"])
+                [UIAlertView bk_showAlertViewWithTitle:@"上傳失敗"
+                                               message:NSPRINTF(@"檔案判讀失敗 %@", [json objectForKey:@"desc"] )
                                      cancelButtonTitle:@"關閉"
                                      otherButtonTitles:nil
                                                handler:^(UIAlertView *alertView, NSInteger buttonIndex) {
                                                    
                                                }];
+                NSLog(@"Data Error: %@", response);
             }
-            
         } else {
             [UIAlertView bk_showAlertViewWithTitle:@"上傳失敗"
                                            message:@"檔案儲存失敗"
