@@ -13,7 +13,7 @@ pod 'AFNetworking', '1.3.2'  # 網路強化, 升級為 2.0 時，前端也需要
 pod 'iVersion' #版本更新通知
 
 pod 'Reachability'
-pod 'AFKissXMLRequestOperation' # AFNetowrking XML 延伸，讀取 XML用, AFN 2.0以上不適用
+#pod 'AFKissXMLRequestOperation'  # AFNetowrking XML 延伸，讀取 XML用, AFN 2.0以上不適用
 #pod 'SDWebImage' # image 強化 https://github.com/rs/SDWebImage
 #pod 'SDURLCache' # url cache 機制
 
