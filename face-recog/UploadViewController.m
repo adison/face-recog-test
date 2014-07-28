@@ -49,7 +49,7 @@
         NSURL *url = [NSURL URLWithString:@"https://m.senao.com.tw/"];
     AFHTTPClient *httpClient = [[AFHTTPClient alloc] initWithBaseURL:url];
     
-    NSURLRequest *request = [httpClient
+    NSMutableURLRequest *request = [httpClient
                              multipartFormRequestWithMethod:@"POST"
 //                             path:@"upload_file.php"
                              path:@"dev_appsvc/jsp/facesex/FileUpload.jsp"
@@ -60,7 +60,7 @@
                                                          fileName:NSPRINTF(@"%i.png", (arc4random()%100))
                                                          mimeType:@"image/png"];
                              }];
-
+    request.timeoutInterval = 180;
     
     // 上傳到空間
     AFJSONRequestOperation *operation = [[AFJSONRequestOperation alloc] initWithRequest:request];
