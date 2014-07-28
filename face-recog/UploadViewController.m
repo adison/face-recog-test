@@ -62,19 +62,25 @@
         
         NSLog(@"Sent %lld of %lld bytes", totalBytesWritten, totalBytesExpectedToWrite);
         CGFloat progress = ((CGFloat)totalBytesWritten) / totalBytesExpectedToWrite * 100;
-//        [SVProgressHUD showProgress:50 status:[NSString stringWithFormat:@"%0.1f %%", progress]];
+
+        [SVProgressHUD showProgress:50
+                             status:[NSString stringWithFormat:@"%0.1f %%", progress]
+                           maskType:SVProgressHUDMaskTypeBlack];
         
         NSLog(@"%0.1f %%", progress);
     }];
     
     // 檢查是否上傳成功？, 顯示心檔名
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id response) {
+        [SVProgressHUD dismiss];
         NSLog(@"response string: %@", operation.responseString);
         if (response != nil) {
             NSDictionary *json = (NSDictionary*)response;
             
             [UIAlertView bk_showAlertViewWithTitle:@"上傳成功"
-                                           message:NSPRINTF(@"檔案名稱%@", [json objectForKey:@"Upload"])
+                                           message:NSPRINTF(@"檔案名稱%@, 位置: %@",
+                                                            [json objectForKey:@"Upload"],
+                                                            [json objectForKey:@"link"])
                                  cancelButtonTitle:@"關閉"
                                  otherButtonTitles:nil
                                            handler:^(UIAlertView *alertView, NSInteger buttonIndex) {
@@ -83,17 +89,27 @@
             pUrl = [NSURL URLWithString:[json objectForKey:@"link"]];
             
         } else {
-            //error
+            [UIAlertView bk_showAlertViewWithTitle:@"上傳失敗"
+                                           message:@"檔案儲存失敗"
+                                 cancelButtonTitle:@"關閉"
+                                 otherButtonTitles:nil
+                                           handler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                                               
+                                           }];
             NSLog(@"Data Error: %@", response);
-            
         }
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"Error: %@", [error localizedDescription]);
+        [SVProgressHUD dismiss];
+        [UIAlertView bk_showAlertViewWithTitle:@"上傳失敗"
+                                       message:NSPRINTF(@"Error: %@", [error localizedDescription])
+                             cancelButtonTitle:@"關閉"
+                             otherButtonTitles:nil
+                                       handler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                                           
+                                       }];
     }];
     [httpClient enqueueHTTPRequestOperation:operation];
-//    [operation start];
-    
 }
 
 

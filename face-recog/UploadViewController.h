@@ -10,6 +10,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AFNetworking/AFNetworking.h>
 #import <MBProgressHUD/MBProgressHUD.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 @interface UploadViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate> {
     BOOL isFromGallery;
     UIImage *pImg;
