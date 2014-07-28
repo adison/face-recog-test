@@ -16,6 +16,47 @@
 @synthesize imageView;
 @synthesize seg;
 
+-(IBAction)tapGoUpload:(id)sender {
+    UploadViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"UploadViewController"];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+-(IBAction)tapGoMoview:(id)sender {
+
+//    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, YES, 0);
+    UIGraphicsBeginImageContextWithOptions(imageView.bounds.size, YES, 0);
+
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    
+    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+    
+    CGAffineTransform tran = CGAffineTransformIdentity;
+//    tran = CGAffineTransformScale(tran, 1.0f, -1.0f);
+//    tran = CGAffineTransformTranslate(tran, 0.0f, -img.size.height);
+    
+    
+    
+    CGPoint pp = CGPointMake(300, 20);
+    CGFloat radius = 20;
+
+    CGContextSetLineWidth(ctx, 2.0f);// * scale);
+
+    CGContextSetRGBFillColor(ctx, 1.0f, 0.0f, 0.0f, 0.4f);
+
+    CGContextAddArc(ctx, pp.x, pp.y, radius, 0, M_PI * 2, 1);
+    CGContextDrawPath(ctx, kCGPathFillStroke);
+    
+    CGAffineTransformScale(tran, 0.5f, 0.5f);
+    
+    self.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+
+    UIGraphicsEndImageContext();
+    
+}
+
+#pragma mark - test
+
+
 -(void)recog {
     UIImage *image = [pImage copy];
     int exifOrientation;
@@ -167,7 +208,7 @@
 #pragma mark - 基本
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    self.navigationController.navigationBarHidden = YES;
+    self.navigationController.navigationBarHidden = NO;
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -258,4 +299,6 @@
         [alert show];
     }
 }
+
+
 @end

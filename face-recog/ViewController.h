@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <KGModal/KGModal.h>
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "UploadViewController.h"
+
 @interface ViewController : UIViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
     UIImage *pImage;
     CGFloat scale;
@@ -18,5 +20,5 @@
 @property (nonatomic) IBOutlet UISegmentedControl *seg;
 -(IBAction)tapPhoto:(id)sender;
 -(IBAction)tapGoMoview:(id)sender;
-
+-(IBAction)tapGoUpload:(id)sender;
 @end
