@@ -25,7 +25,7 @@ pod 'GoogleAnalytics-iOS-SDK'
 
 # UI
 pod 'MBProgressHUD' #hud
-
+pod 'SVProgressHUD' #hud
 ############ Senao Helper 基本套件结束 ##############
 
 ###############  專案特殊套件
