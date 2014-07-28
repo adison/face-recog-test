@@ -29,6 +29,7 @@
         }
     }
 }
+
 -(IBAction)tapUpload:(id)sender {
     // 把圖片更改尺寸、壓縮，改名字為 xx.png
     pUrl = nil;
@@ -51,7 +52,7 @@
                              constructingBodyWithBlock: ^(id <AFMultipartFormData> formData) {
                                  [formData appendPartWithFileData:dataToUpload
                                                              name:@"file"
-                                                         fileName:NSPRINTF(@"%i.png", (arc4random()/100))
+                                                         fileName:NSPRINTF(@"%i.png", (arc4random()%100))
                                                          mimeType:@"image/png"];
                              }];
 
